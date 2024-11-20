@@ -6,15 +6,22 @@ from bs4 import BeautifulSoup
 import os
 import shutil
 import glob
+from pathlib import Path
 
-# Set up paths and environment
-script_path = os.path.abspath(__file__)
-script_dir = os.path.dirname(script_path)
-# project_root = os.path.dirname(os.path.dirname(os.path.dirname(script_dir)))
-os.chdir(script_dir)
+# Get the project root (hack_2024_cs)
+current_file = Path(__file__).resolve()
+project_root = current_file.parents[2]  # Go up 3 levels from the current file
+
+# Verify we're in the correct directory
+if project_root.name != "hack_2024_cs":
+    raise RuntimeError("Could not find hack_2024_cs project root")
 
 # Load environment variables from project root
-load_dotenv(os.path.join(script_dir, '.env'))
+load_dotenv(project_root / ".env")
+
+# Set working directory to script directory if needed
+script_dir = current_file.parent
+os.chdir(script_dir)
 
 def move_to_obselete():
     """Move existing CSV files from results to obselete folder"""
