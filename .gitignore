@@ -39,3 +39,5 @@ wheels/
 *.swp
 *.swo
 .DS_Store
+
+test.db
