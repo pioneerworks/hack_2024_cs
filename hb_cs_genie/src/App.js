@@ -20,36 +20,39 @@ function App() {
   const [error, setError] = useState('')
   const API_ENDPOINT = 'http://127.0.0.1:8000'
 
-  const pollForAnswer = async (id) => {
-    try {
-      const response = await fetch(`${API_ENDPOINT}/get_query?id=${id}`);
-      if (!response.ok) throw new Error('Failed to fetch answer');
-      const data = await response.json();
+  useEffect(() => {
+    if(data.status !== 'in-progress') { return }
+    const pollForAnswer = async (id) => {
+      try {
+        const response = await fetch(`${API_ENDPOINT}/get_query?id=${id}`);
+        if (!response.ok) throw new Error('Failed to fetch answer');
+        const data = await response.json();
 
-      console.log(data.status)
-      switch (data.status) {
-        case 'completed':
-          setAnswer(data.answer);
-          setStatus('answered');
-          console.log(answer)
-          break;
-        case 'in-progress':
-          // Continue polling after a delay
-          setTimeout(() => pollForAnswer(id), 1000);
-          break;
-        case 'error':
-          setError('An error occurred while processing your question.');
-          setStatus('idle');
-          break;
-        default:
-          setError('Unexpected response from server');
-          setStatus('idle');
+        console.log(data.status)
+        switch (data.status) {
+          case 'completed':
+            setAnswer(data.answer);
+            setStatus('answered');
+            console.log(answer)
+            break;
+          case 'in-progress':
+            // Continue polling after a delay
+            setTimeout(() => pollForAnswer(id), 1000);
+            break;
+          case 'error':
+            setError('An error occurred while processing your question.');
+            setStatus('idle');
+            break;
+          default:
+            setError('Unexpected response from server');
+            setStatus('idle');
+        }
+      } catch (err) {
+        setError('Failed to fetch answer. Please try again.');
+        setStatus('idle');
       }
-    } catch (err) {
-      setError('Failed to fetch answer. Please try again.');
-      setStatus('idle');
-    }
-  };
+    };
+  }, [status, answer]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,9 +72,9 @@ function App() {
       if (!response.ok) throw new Error('Failed to submit question');
       const data = await response.json();
       setId(data.id);
-      setStatus('polling');
+      setStatus('in-progress');
       // Start polling for the answer
-      pollForAnswer(data.id);
+      // pollForAnswer(data.id);
     } catch (err) {
       setError('Failed to submit question. Please try again.');
       setStatus('idle');
