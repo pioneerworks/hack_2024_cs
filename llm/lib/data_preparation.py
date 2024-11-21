@@ -34,7 +34,7 @@ class DataPreparator:
         """
         df = pd.read_csv(file_path)
         # Remove any rows where essential columns are null
-        df = df.dropna(subset=['Title', 'Article_Body__c'])
+        df = df.dropna(subset=['url', 'content'])
         return df
 
     def clean_text(self, text: str) -> str:
@@ -91,18 +91,15 @@ class DataPreparator:
         prepared_docs = []
         for _, row in df.iterrows():
             # Combine title and body
-            full_text = f"{row['Title']}\n\n{row['Article_Body__c']}"
+            full_text = f"{row['title']}\n\n{row['content']}"
             cleaned_text = self.clean_text(full_text)
             # Create chunks
             chunks = self.create_chunks(cleaned_text)
             # Create document for each chunk
             for i, chunk in enumerate(chunks):
                 doc = {
-                    'id': f"{row['Id']}_{i}",
-                    'article_id': row['Id'],
-                    'article_number': row['ArticleNumber'],
-                    'title': row['Title'],
-                    'url': row['Knowledge_Article_URL__c'],
+                    'title': row['title'],
+                    'url': row['url'],
                     'chunk_index': i,
                     'total_chunks': len(chunks),
                     'text': chunk
@@ -115,8 +112,23 @@ def main():
     Main function to run the data preparation process.
     """
     preparator = DataPreparator(chunk_size=1000)
-    prepared_docs = preparator.prepare_data(f"{preparator.project_root}/data_sources/salesforce_kb_download/results/processed_knowledge_data.csv")
-    print(f"Total documents prepared: {len(prepared_docs)}")
+    data_dir = f"{preparator.project_root}/data_sources/processed_data_compiled"
+    csv_files = [
+        "processed_knowledge_data.csv",
+        "processed_slack_data.csv"
+    ]
+    
+    prepared_docs = []
+    for csv_file in csv_files:
+        file_path = f"{data_dir}/{csv_file}"
+        if os.path.exists(file_path):
+            docs = preparator.prepare_data(file_path)
+            prepared_docs.extend(docs)
+            print(f"Loaded {len(docs)} documents from {csv_file}")
+        else:
+            print(f"Warning: File not found - {csv_file}")
+    
+    print(f"Total documents prepared across all sources: {len(prepared_docs)}")
     print(f"Average chunk length: {np.mean([len(doc['text']) for doc in prepared_docs]):.2f} characters")
     output_df = pd.DataFrame(prepared_docs)
     output_df.to_csv(f'{preparator.project_root}/llm/data/prepared_docs.csv', index=False)

@@ -8,6 +8,9 @@ venv/
 env/
 ENV/
 
+# Sandbox
+sandbox/
+
 # Data files
 *.csv
 *.npy

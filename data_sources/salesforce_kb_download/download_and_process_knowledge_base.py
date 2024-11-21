@@ -16,12 +16,25 @@ project_root = current_file.parents[2]  # Go up 3 levels from the current file
 if project_root.name != "hack_2024_cs":
     raise RuntimeError("Could not find hack_2024_cs project root")
 
-# Load environment variables from project root
+print(f"Project root: {project_root}")
+# Add this after your project_root definition
+env_path = project_root / ".env"
+print(f"\nChecking .env file at: {env_path}")
+
+if env_path.exists():
+    print("\n.env file contents:")
+    print("-" * 50)
+    with open(env_path, 'r') as f:
+        print(f.read())
+    print("-" * 50)
+else:
+    print(f"\nERROR: .env file not found at {env_path}")
+
+# Then continue with your existing code
 load_dotenv(project_root / ".env")
 
 # Set working directory to script directory if needed
-script_dir = current_file.parent
-os.chdir(script_dir)
+script_dir = f"{project_root}/data_sources/salesforce_kb_download/"
 
 def move_to_obselete():
     """Move existing CSV files from results to obselete folder"""
@@ -118,22 +131,11 @@ def download_knowledge_data():
         sf_args["domain"] = "test"
     sf = Salesforce(**sf_args)
 
-    print("Getting metadata...")
-    account_metadata = sf.Knowledge__kav.describe()
-
-    compound_field_names_set = set()
-    for field in account_metadata['fields']:
-        compound_field_name = field.get('compoundFieldName')
-        if compound_field_name:
-            compound_field_names_set.add(compound_field_name)
-    compound_field_names_set.discard('Name')
-    
-    field_names = [field['name'] for field in account_metadata['fields'] 
-                  if field['name'] not in compound_field_names_set]
 
     print("Downloading knowledge articles...")
-    # query = f"SELECT {', '.join(field_names)} FROM Knowledge__kav"
-    query = f"SELECT Id, ArticleNumber, Title, Article_Body__c, Knowledge_Article_URL__c FROM Knowledge__kav"
+    query = (
+        "SELECT Id, ArticleNumber, Title, Article_Body__c, Knowledge_Article_URL__c FROM Knowledge__kav"
+    )
     results_dir = os.path.join(script_dir, 'results')
     sf.bulk2.Knowledge__kav.download(
         query, path=results_dir, max_records=10000000
@@ -143,26 +145,34 @@ def download_knowledge_data():
 def process_knowledge_data():
     try:
         print("\nProcessing downloaded data...")
-        # Read most recent CSV
         latest_csv = get_latest_csv()
         print(f"Reading file: {latest_csv}")
         df = pd.read_csv(latest_csv)
         
-        # Clean the HTML content in Article_Body__c
+        # Clean the HTML content and create content column
         print("Cleaning HTML content...")
-        df['Article_Body__c'] = df['Article_Body__c'].apply(strip_html)
+        df['content'] = df['Article_Body__c'].apply(strip_html)
         
-        # Save results with all columns
-        output_path = os.path.join(script_dir, 'results', 'processed_knowledge_data.csv')
+        # Rename columns
+        df = df.rename(columns={
+            'Title': 'title',
+            'Knowledge_Article_URL__c': 'url'
+        })
+        
+        # Select only the required columns
+        df = df[['url', 'title', 'content']]
+        
+        # Save results
+        output_path = os.path.join(project_root, 'data_sources/processed_data_compiled/processed_knowledge_data.csv')
         df.to_csv(output_path, index=False)
         print(f"Cleaned data saved to {output_path}")
         
         # Show sample
         print("\nFirst cleaned article sample:")
         print("-" * 50)
-        print(f"Title: {df['Title'].iloc[0]}")
+        print(f"Title: {df['title'].iloc[0]}")
         print("-" * 50)
-        print(df['Article_Body__c'].iloc[0])
+        print(df['content'].iloc[0])
         
     except Exception as e:
         print(f"Error during processing: {str(e)}")

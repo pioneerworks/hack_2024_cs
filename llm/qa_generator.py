@@ -5,20 +5,27 @@ import numpy as np
 import os
 import tiktoken
 import sys
+from pathlib import Path
 
-current_file_path = os.path.abspath(__file__)
-project_root = os.path.dirname(os.path.dirname(current_file_path))
-sys.path.append(project_root)
+# Get the project root (hack_2024_cs)
+current_file = Path(__file__).resolve()
+project_root = current_file.parents[1]  # Go up 2 levels from the current file
 
+# Verify we're in the correct directory
+if project_root.name != "hack_2024_cs":
+    raise RuntimeError("Could not find hack_2024_cs project root")
+
+# Load environment variables from project root
+load_dotenv(project_root / ".env")
+
+# Add to Python path if needed
+if str(project_root) not in sys.path:
+    sys.path.append(str(project_root))
 
 # Now use absolute imports
 from llm.lib.vector_store import VectorStore
 from llm.lib.embedding import EmbeddingGenerator
 from llm.lib.data_preparation import get_project_root
-
-# Set up paths and environment
-script_dir = os.path.dirname(current_file_path)
-load_dotenv(os.path.join(script_dir, '.env'))
 
 class QAGenerator:
     def __init__(self, max_tokens: int = 4096, model: str = "claude-3-5-sonnet-20241022"):
