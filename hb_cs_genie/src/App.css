@@ -9,7 +9,7 @@
   .search-box {
     gap: 10px;
     display: flex;
-    max-width: 900px;
+    max-width: 1100;
     /*flex-direction: row;*/
   }
 }
@@ -52,15 +52,17 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #f8f5ff;
+  background: linear-gradient(135deg, #d4b5ff 0%, #6b4984 50%, #3e006a 100%) !important;
+  min-height: 100vh;
+  background-attachment: fixed;
 }
 
 .mantine-Button-root {
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .mantine-Button-root:hover:not(:disabled) {
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #9f85ff 0%, #7e5cf6 100%) !important;
 }
 
 .mantine-TextInput-input::placeholder {
@@ -68,7 +70,7 @@ body {
 }
 
 .mantine-TextInput-input {
-  background-color: white !important;
+  background-color: rgb(254, 248, 255) !important;
 }
 
 /* Add styles for markdown content */
@@ -109,5 +111,35 @@ body {
 .mantine-TextInput-input:focus {
   outline: none;
   border-color: #8B5CF6 !important;
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.2);
+}
+
+/* Update container background to be slightly transparent */
+.mantine-Container-root {
+  background-color: rgba(241, 237, 255, 0.9) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.search-button {
+  transition: all 0.2s ease !important;
+  background: #8B5CF6 !important;  /* Base color */
+}
+
+.search-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #9f85ff 0%, #7e5cf6 100%) !important;
+}
+
+.search-button:active {
+  transform: scale(0.95) !important;
+}
+
+.search-button.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.98); }
+  100% { transform: scale(1); }
 }

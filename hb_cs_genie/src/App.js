@@ -100,17 +100,24 @@ function App() {
         size="xl"
         style={{
           minHeight: '100vh',
-          backgroundColor: '#f8f5ff',
+          backgroundColor: '#f1edff',
           padding: '40px 20px'
         }}
       >
         {/* Title Section */}
         <Box style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <Title order={1} style={{ fontSize: '2.5rem', marginBottom: '10px' }}>
+          <Title order={1} style={{ 
+            fontSize: '2.5rem', 
+            marginBottom: '10px',
+            background: 'linear-gradient(140deg, #693eff 20%, #b93eff 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
             Homebase Genie
           </Title>
           <Text size="lg" color="dimmed">
-            Ask me anything about Homebase
+            Built by Queryous Minds.
           </Text>
         </Box>
 
@@ -127,7 +134,7 @@ function App() {
           <form onSubmit={handleSubmit}>
             <Box style={{ display: 'flex', gap: '10px' }}>
               <TextInput
-                placeholder="Ask AI a Homebase Question..."
+                placeholder="Ask a question related to Homebase product..."
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 disabled={status === 'in-progress'}
@@ -137,7 +144,7 @@ function App() {
                     borderRadius: '12px',
                     border: '1px solid #e0e0e0',
                     fontSize: '16px',
-                    width: '480px',
+                    width: '460px',
                     '&:focus': {
                       borderColor: '#8B5CF6',
                     },
@@ -146,6 +153,9 @@ function App() {
                       cursor: 'not-allowed'
                     },
                     paddingLeft: '20px',
+                    paddingRight: '20px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                   },
                   wrapper: {
                     width: '450px',
@@ -154,13 +164,14 @@ function App() {
               />
               <Button
                 type="submit"
+                className={`search-button ${status === 'in-progress' ? 'loading' : ''}`}
                 disabled={!question.trim() || status === 'in-progress'}
                 loading={status === 'in-progress'}
                 style={{
                   backgroundColor: '#8B5CF6',
-                  height: '45px',
+                  height: '48px',
                   padding: '0 30px',
-                  borderRadius: '18px',
+                  borderRadius: '14px',
                   fontSize: '16px',
                   fontWeight: '500',
                   cursor: status === 'in-progress' ? 'not-allowed' : 'pointer',
@@ -222,7 +233,13 @@ function App() {
                   paddingTop: '15px'
                 }}
               >
-                <ReactMarkdown>
+                <ReactMarkdown
+                  components={{
+                    a: ({ node, ...props }) => (
+                      <a {...props} target="_blank" rel="noopener noreferrer" />
+                    )
+                  }}
+                >
                   {qa.answer}
                 </ReactMarkdown>
               </Box>
