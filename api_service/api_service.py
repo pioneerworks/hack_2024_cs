@@ -3,9 +3,19 @@ from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, Integer, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from llm.qa_generator import qa_function
+from fastapi.middleware.cors import CORSMiddleware  # Add this import
+
+import uvicorn
 
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # React's default port
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -25,7 +35,8 @@ class QueryRequest(BaseModel):
 
 def process_query_text(query_text: str) -> str:
     # the calls to the LLM should go here
-    return f"This is a test response"
+    return qa_function(query_text)
+
 
 def update_query_response(query_id: int, query_text: str):
     db = SessionLocal()
@@ -56,12 +67,23 @@ async def get_query(id: int):
     db = SessionLocal()
     query = db.query(CsHelpAgentQueries).filter(CsHelpAgentQueries.id == id).first()
     db.close()
+    
     if not query:
         raise HTTPException(status_code=404, detail="Query not found")
-    # return {"id": query.id, "query_text": query.query_text, "response_received": query.response_received, "response_text": query.response_text}
-    # In case you want to pull any elements of the response, here is how you can access those
-    return query.response_text
+    
+    # Determine status based on response_received and response_text
+    status = "error"
+    if not query.response_received:
+        status = "in-progress"
+    elif query.response_received and query.response_text != str(None):
+        status = "completed"
+    
+    return {
+        "id": query.id,
+        "status": status,
+        "answer": query.response_text if query.response_text != str(None) else ""
+    }
 
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)
+
