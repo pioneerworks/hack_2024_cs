@@ -48,3 +48,66 @@
     transform: rotate(360deg);
   }
 }
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f8f5ff;
+}
+
+.mantine-Button-root {
+  transition: all 0.2s ease;
+}
+
+.mantine-Button-root:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.mantine-TextInput-input::placeholder {
+  color: #6B7280;
+}
+
+.mantine-TextInput-input {
+  background-color: white !important;
+}
+
+/* Add styles for markdown content */
+.markdown-content {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.markdown-content p {
+  margin-bottom: 1em;
+}
+
+.markdown-content code {
+  background-color: #f5f5f5;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.markdown-content pre {
+  background-color: #f5f5f5;
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+/* Add disabled state styles */
+.mantine-TextInput-input:disabled {
+  opacity: 0.7;
+}
+
+.mantine-Button-root:disabled {
+  opacity: 0.7;
+  cursor: not-allowed !important;
+}
+
+/* Add focus styles */
+.mantine-TextInput-input:focus {
+  outline: none;
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
