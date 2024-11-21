@@ -171,34 +171,30 @@ class QAGenerator:
             print(f"Error generating answer: {e}")
             return "I apologize, but I encountered an error while generating the answer."
 
-def main():
+def qa_function(question: str):
     """
     Main function to test the QA generator.
     """
     qa_generator = QAGenerator()
     
     # Test questions
-    test_questions = [
-        # "What is Task Manager in Homebase?",
-        "How do I handle payroll corrections after December?",
-        # "What should I do if I need to change my company's legal address?"
-        #  "Where are the cx tax returns/payments found"
-        # "Hi team, I have a customer who's having an issue with their Breaks. They have set up their settings to grant employees to have 10 minute paid breaks. However, on the timesheets, breaks over 10 mins are still being calculated as Paid."
-    ]
+    # test_questions = [
+    #     # "What is Task Manager in Homebase?",
+    #     "How do I handle payroll corrections after December?",
+    #     # "What should I do if I need to change my company's legal address?"
+    #     #  "Where are the cx tax returns/payments found"
+    #     # "Hi team, I have a customer who's having an issue with their Breaks. They have set up their settings to grant employees to have 10 minute paid breaks. However, on the timesheets, breaks over 10 mins are still being calculated as Paid."
+    # ]
     
-    for question in test_questions:
-        print(f"\nQuestion: {question}")
-        print("\nAnswer:")
-        answer = qa_generator.generate_answer(question)
-        print("\n\n")
-        print(answer)
-        print("\n\n")
-        print("-" * 80)
+    print(f"\nQuestion: {question}")
+    print("\nAnswer:")
+    answer = qa_generator.generate_answer(question)
+    print("\n\n")
+    print(answer)
+    print("\n\n")
+    print("-" * 80)
+    return answer
 
-if __name__ == "__main__":
-    main()
-    
-    
 
 
 
