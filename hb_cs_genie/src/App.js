@@ -21,7 +21,8 @@ function App() {
   const API_ENDPOINT = 'http://127.0.0.1:8000'
 
   useEffect(() => {
-    if(data.status !== 'in-progress') { return }
+    if(status !== 'in-progress') { return }
+    
     const pollForAnswer = async (id) => {
       try {
         const response = await fetch(`${API_ENDPOINT}/get_query?id=${id}`);
@@ -52,7 +53,16 @@ function App() {
         setStatus('idle');
       }
     };
-  }, [status, answer]);
+
+    // Add this line to actually start polling
+    pollForAnswer(id);
+    
+    // Add cleanup function
+    return () => {
+      // Clean up any pending timeouts if component unmounts
+      clearTimeout();
+    };
+  }, [status, answer, id]); // Add id to dependencies
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -103,7 +113,7 @@ function App() {
 
         {status === 'polling' && <p className="mt-4">Checking status...</p>}
         {status === 'fetching' && <p className="mt-4">Fetching answer...</p>}
-        {(status === 'completed' && answer) && (
+        {(status === 'answered' && answer) && (
           <Box bg="#eae7e7" style={{ border: "2px", borderRadius: "15px", padding: " 2px 15px 2px 15px" }}>
             <h4 className="font-semibold">
               {question}
