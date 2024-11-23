@@ -125,7 +125,7 @@ class QAGenerator:
             "If the answer cannot be found in the context, say 'I don't have enough information to answer that question.' "
             "Total output characters should be less than 50000. "
             "If you find the answer, include the relevant article URLs at the bottom of your response using the format: "
-            "\n\n---\n\nFor more information, see: [Article Title or Slack thread url](URL)\n\n"
+            "\n\n---\n\nFor more information, see: [Title and if title not available URL](URL)\n\n"
         )
         context = ""
         total_tokens = self.count_tokens(base_prompt + question)
@@ -169,7 +169,7 @@ class QAGenerator:
                 model=self.model,
                 max_tokens=1000,
                 messages=[{"role": "user", "content": prompt}],
-                temperature=1
+                temperature=0.3
             )
 
             return response.content[0].text

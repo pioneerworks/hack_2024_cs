@@ -43,7 +43,7 @@ def clean_slack_data(raw_message):
         return raw_message  # Return original if processing fails
 
 # Read the CSV file
-df = pd.read_csv('data_sources/slack_channel_data/#advanced-support_large_replies.csv')
+df = pd.read_csv('data_sources/slack_channel_data/#advanced-support_breakdown - compiled.csv')
 
 # Clean the specific column (replace 'conversation_column' with your column name)
 df['content'] = df['conversation'].apply(clean_slack_data)

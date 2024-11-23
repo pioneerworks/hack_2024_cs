@@ -123,11 +123,11 @@ body {
 
 .search-button {
   transition: all 0.2s ease !important;
-  background: #8B5CF6 !important;  /* Base color */
+  background: #9c39c7 !important;  /* Base color */
 }
 
 .search-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #9f85ff 0%, #7e5cf6 100%) !important;
+  background: linear-gradient(135deg, #6506a9 0%, #4B0082 100%) !important;
 }
 
 .search-button:active {
@@ -142,4 +142,39 @@ body {
   0% { transform: scale(1); }
   50% { transform: scale(0.98); }
   100% { transform: scale(1); }
+}
+
+.title-wrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  padding: 10px 0;
+}
+
+.title-text {
+  background: linear-gradient(150deg, #4B0082 10%, #b93eff 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+  transition: transform 0.3s ease;
+}
+
+.line-reveal {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  height: 1.5px;
+  width: 0;
+  background: linear-gradient(90deg, #4B0082, #b93eff);
+  transition: width 0.6s ease;
+  transform: translateX(-50%);
+}
+
+.title-wrapper:hover .line-reveal {
+  width: 100%;
+}
+
+.title-wrapper:hover .title-text {
+  transform: translateY(-2px);
 }

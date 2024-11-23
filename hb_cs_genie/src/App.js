@@ -11,9 +11,11 @@ import {
   Container,
 } from "@mantine/core";
 import { IconSearch } from '@tabler/icons-react';
+import { ThreeDot } from 'react-loading-indicators'
 
 function App() {
   const [question, setQuestion] = useState('')
+  const [currentQuestion, setCurrentQuestion] = useState('')
   const [id, setId] = useState(null)
   const [status, setStatus] = useState('completed')
   const [answer, setAnswer] = useState('')
@@ -37,7 +39,7 @@ function App() {
             setStatus('answered');
             console.log(answer)
             setQaHistory(prevHistory => [{
-              question: question,
+              question: currentQuestion,
               answer: data.answer
             }, ...prevHistory]);
             break;
@@ -67,12 +69,14 @@ function App() {
       // Clean up any pending timeouts if component unmounts
       clearTimeout();
     };
-  }, [status, answer, id]); // Add id to dependencies
+  }, [status, answer, id, currentQuestion]); // Add id and currentQuestion to dependencies
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!question.trim() || status === 'in-progress') return;
 
+    setCurrentQuestion(question);
+    setQuestion('');
     setStatus('submitting');
     setError(null);
     setAnswer(null);
@@ -106,18 +110,22 @@ function App() {
       >
         {/* Title Section */}
         <Box style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <Title order={1} style={{ 
-            fontSize: '2.5rem', 
-            marginBottom: '10px',
-            background: 'linear-gradient(140deg, #693eff 20%, #b93eff 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
-          }}>
-            Homebase Genie
+          <Title
+            order={1}
+            className="title-wrapper"
+            style={{
+              fontSize: '2.5rem',
+              marginBottom: '0px',
+              display: 'inline-block'
+            }}
+          >
+            <span className="title-text">
+              Homebase Genie
+            </span>
+            <div className="line-reveal" />
           </Title>
-          <Text size="lg" color="dimmed">
-            Built by Queryous Minds.
+          <Text size="lg" style={{ color: '#6b6b6b' }}>
+            Built by Queryous Minds and LLMs.
           </Text>
         </Box>
 
@@ -134,7 +142,7 @@ function App() {
           <form onSubmit={handleSubmit}>
             <Box style={{ display: 'flex', gap: '10px' }}>
               <TextInput
-                placeholder="Ask a question related to Homebase product..."
+                placeholder="Enter your Homebase-related question here..."
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 disabled={status === 'in-progress'}
@@ -155,7 +163,7 @@ function App() {
                     paddingLeft: '20px',
                     paddingRight: '20px',
                     overflow: 'hidden',
-                    textOverflow: 'ellipsis',
+                    textOverflow: 'ellipsis'
                   },
                   wrapper: {
                     width: '450px',
@@ -168,7 +176,7 @@ function App() {
                 disabled={!question.trim() || status === 'in-progress'}
                 loading={status === 'in-progress'}
                 style={{
-                  backgroundColor: '#8B5CF6',
+                  backgroundColor: '#4B0082',
                   height: '48px',
                   padding: '0 30px',
                   borderRadius: '14px',
@@ -200,9 +208,9 @@ function App() {
         {/* Results Section */}
         <Box style={{ maxWidth: '600px', margin: '20px auto' }}>
           {status === 'in-progress' && (
-            <Text align="center" color="dimmed">
-              Thinking...
-            </Text>
+            <Box style={{ display: 'flex', justifyContent: 'center', marginTop: '30px', marginBottom: '30px' }}>
+              <ThreeDot color="#8B5CF6" size="small" text="" textColor="#8B5CF6" />
+            </Box>
           )}
 
           {qaHistory.map((qa, index) => (
@@ -221,16 +229,18 @@ function App() {
                 mb={10}
                 style={{
                   fontWeight: 700,  // Make question bold
-                  color: '#1a1a1a'  // Darker color for better contrast
+                  color: '#1a1a1a',  // Darker color for better contrast
+                  fontSize: '14px'
                 }}
               >
                 {qa.question}
               </Text>
               <Box
                 style={{
-                  marginTop: '15px',
+                  marginTop: '5px',
                   borderTop: '1px solid #f0f0f0',
-                  paddingTop: '15px'
+                  paddingTop: '5px',
+                  fontSize: '14px'
                 }}
               >
                 <ReactMarkdown
